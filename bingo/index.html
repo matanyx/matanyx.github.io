@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Bingo Generator</title>
+</head>
+<body>
+
+<h1>Bingo Generator</h1>
+
+<form>
+    <label for="word_list_input">Insert your words:</label>
+    <br/>
+    <textarea id="word_list_input" name="word_list_input" rows="10" cols="50"></textarea>
+    <br/>
+    <label for="board_size">Board size:</label>
+    <select name="board_size" id="board_size">
+        <option value="4">4x4</option>
+        <option value="5">5x5</option>
+    </select>
+    <br/>
+    <label for="board_count">Number of boards:</label>
+    <input id="board_count" name="board_count" type="number" value="8"/>
+    <br/><br/>
+    <input type="button" value="Go" onclick="generate();"/>
+</form>
+
+<script>
+    function init() {
+        document.getElementById("boards").innerHTML = "";
+        setErrorString("");
+        console.clear();
+    }
+
+    function setErrorString(err_str) {
+        console.error(err_str);
+        document.getElementById("err_prompt").innerText = err_str;
+    }
+
+    function getWordList() {
+        word_list_input_value = document.getElementById("word_list_input").value;
+        if (word_list_input_value == null) {
+            return [];
+        }
+
+        all_words_regex_match = word_list_input_value.match(/[^\r\n]+/g);
+        if (all_words_regex_match == null || all_words_regex_match.length == 0){
+            return [];
+        }
+
+        all_words_arr = all_words_regex_match.filter(String);
+        return [...new Set(all_words_arr)];
+    }
+
+    function getBoardSize() {
+        return parseInt(document.getElementById("board_size").value);
+    }
+
+    function getBoardCount() {
+        return parseInt(document.getElementById("board_count").value);
+    }
+
+    // nPk = n!/(n-k)!
+    function permutationCount(n, k) {
+        if ((typeof n !== 'number') || (typeof k !== 'number')) {
+            return false;
+        }
+
+        var coeff = 1;
+        for (var x = n-k+1; x <= n; x++) {
+            coeff *= x;
+        }
+
+        return coeff;
+    }
+
+    function subarrayChoice(arr, choice_size) {
+        var shuffled = arr.slice(0), i = arr.length, temp, index;
+        while (i--) {
+            index = Math.floor((i + 1) * Math.random());
+            temp = shuffled[index];
+            shuffled[index] = shuffled[i];
+            shuffled[i] = temp;
+        }
+        return shuffled.slice(0, choice_size);
+    }
+
+    function getBoardHTML(board_words, board_size) {
+        html_val = "<p style='page-break-before: always'><table style='width: 100%; border: 1px solid black'>";
+
+        for (var i = 0; i < board_size; ++i) {
+            html_val += "<tr style='border: 1px solid black'>"
+            for (var j = 0; j < board_size; ++j) {
+                html_val += "<td style='border: 1px solid black; font-size: 48px; text-align: center; padding: 100px;'>" + board_words[board_size * i + j] + "</td>"
+            }
+            html_val += "</tr>";
+        }
+
+        html_val += "</table>";
+        return html_val;
+    }
+
+    function generate() {
+        init();
+
+        word_list = getWordList();
+        board_size = getBoardSize();
+        word_count_in_board = board_size * board_size;
+        board_count = getBoardCount();
+        maximum_boards_possible = permutationCount(word_list.length, word_count_in_board);
+
+        console.log("Word list: " + word_list);
+        console.log("Word list size: " + word_list.length);
+        console.log("Board size: " + board_size);
+        console.log("Word count in board: " + word_count_in_board);
+        console.log("Board count: " + board_count);
+        console.log("Maximum boards possible: " + maximum_boards_possible);
+
+        if (word_list == null || word_list.length < word_count_in_board) {
+            return setErrorString("Word list needs a minimum of " + word_count_in_board + " unique words for board size " + board_size + "x" + board_size);
+        }
+
+        if (board_count <= 0) {
+            return setErrorString("Board count must be greater than 0");
+        }
+
+        if (board_count > maximum_boards_possible) {
+            return setErrorString("Board count can't be more than " + maximum_boards_possible +" words for " + word_list.length + " words in word list and board size " + board_size + "x" + board_size);
+        }
+
+        console.log("Choosing word subsets");
+        board_choices = [];
+
+        while (board_choices.length < board_count) {
+            current_choice = subarrayChoice(word_list, word_count_in_board);
+
+            if (board_choices.includes(current_choice)) {
+                console.log("Already exists: " + current_choice);
+                continue;
+            }
+
+            console.log("Adding: " + current_choice);
+            board_choices.push(current_choice);
+        }
+
+        boards_htmls = board_choices.map(x => getBoardHTML(x, board_size));
+        boards_html = boards_htmls.join("<br/><br/><br/>");
+
+        document.getElementById("boards").innerHTML = boards_html;
+    }
+</script>
+
+<br/>
+<span id="err_prompt" name="err_prompt" style="color: red; font-size: 20px">
+</span>
+
+<span id="boards" name="boards">
+</span>
+
+</body>
+</html>
