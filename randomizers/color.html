@@ -1,0 +1,44 @@
+<html>
+<head>
+<script language="javascript">
+var COLORS = ["red", "green", "blue", "yellow"];
+var DEFAULT_COLOR = "white";
+var COLOR_CHOSEN = false;
+
+function randomize()
+{
+	var div = document.getElementById( 'main' );
+
+    if (COLOR_CHOSEN === false)
+	{
+		var last_index = 0;
+		for (i = 0; i < 8; i++)
+		{
+			setTimeout(function()
+			{
+				var random_index = Math.floor(Math.random() * COLORS.length);
+				while (random_index === last_index)
+				{
+					random_index = Math.floor(Math.random() * COLORS.length);
+				}
+				div.style.backgroundColor = COLORS[random_index];
+				last_index = random_index;
+			}, i*500);
+		}
+		COLOR_CHOSEN = true;
+	}
+	else
+	{
+		div.style.backgroundColor = DEFAULT_COLOR;
+		COLOR_CHOSEN = false;
+	}
+}
+</script>
+</head>
+<body>
+<div style="height:0;width:80%;padding-bottom:80%;background-color:white;margin:auto;border-style:solid" onclick="randomize()" ontouchstart="randomize()" id="main">
+<div id="">
+</div>
+</div>
+</body>
+</html>
