@@ -38,18 +38,18 @@
     }
 
     function getWordList() {
-        word_list_input_value = document.getElementById("word_list_input").value;
+        const word_list_input_value = document.getElementById("word_list_input").value;
         if (word_list_input_value == null) {
             return [];
         }
 
-        all_words_regex_match = word_list_input_value.match(/[^\r\n]+/g);
-        if (all_words_regex_match == null || all_words_regex_match.length == 0){
+        const all_words_regex_match = word_list_input_value.match(/[^\r\n]+/g);
+        if (all_words_regex_match == null || all_words_regex_match.length === 0){
             return [];
         }
 
-        all_words_arr = all_words_regex_match.filter(String);
-        return [...new Set(all_words_arr)];
+        const all_words_arr = all_words_regex_match.filter(String);
+        return [...new Set(all_words_arr.map(s => s.trim()))];
     }
 
     function getBoardSize() {
@@ -66,8 +66,8 @@
             return false;
         }
 
-        var coeff = 1;
-        for (var x = n-k+1; x <= n; x++) {
+        let coeff = 1;
+        for (let x = n-k+1; x <= n; x++) {
             coeff *= x;
         }
 
@@ -75,7 +75,7 @@
     }
 
     function subarrayChoice(arr, choice_size) {
-        var shuffled = arr.slice(0), i = arr.length, temp, index;
+        let shuffled = arr.slice(0), i = arr.length, temp, index;
         while (i--) {
             index = Math.floor((i + 1) * Math.random());
             temp = shuffled[index];
@@ -86,11 +86,11 @@
     }
 
     function getBoardHTML(board_words, board_size) {
-        html_val = "<p style='page-break-before: always'><table style='width: 100%; border: 1px solid black'>";
+        let html_val = "<p style='page-break-before: always'><table style='width: 100%; border: 1px solid black'>";
 
-        for (var i = 0; i < board_size; ++i) {
+        for (let i = 0; i < board_size; ++i) {
             html_val += "<tr style='border: 1px solid black'>"
-            for (var j = 0; j < board_size; ++j) {
+            for (let j = 0; j < board_size; ++j) {
                 html_val += "<td style='border: 1px solid black; font-size: 48px; text-align: center; padding: 100px;'>" + board_words[board_size * i + j] + "</td>"
             }
             html_val += "</tr>";
@@ -103,11 +103,11 @@
     function generate() {
         init();
 
-        word_list = getWordList();
-        board_size = getBoardSize();
-        word_count_in_board = board_size * board_size;
-        board_count = getBoardCount();
-        maximum_boards_possible = permutationCount(word_list.length, word_count_in_board);
+        const word_list = getWordList();
+        const board_size = getBoardSize();
+        const word_count_in_board = board_size * board_size;
+        const board_count = getBoardCount();
+        const maximum_boards_possible = permutationCount(word_list.length, word_count_in_board);
 
         console.log("Word list: " + word_list);
         console.log("Word list size: " + word_list.length);
@@ -116,7 +116,7 @@
         console.log("Board count: " + board_count);
         console.log("Maximum boards possible: " + maximum_boards_possible);
 
-        if (word_list == null || word_list.length < word_count_in_board) {
+        if (word_list.length < word_count_in_board) {
             return setErrorString("Word list needs a minimum of " + word_count_in_board + " unique words for board size " + board_size + "x" + board_size);
         }
 
@@ -129,10 +129,10 @@
         }
 
         console.log("Choosing word subsets");
-        board_choices = [];
+        const board_choices = [];
 
         while (board_choices.length < board_count) {
-            current_choice = subarrayChoice(word_list, word_count_in_board);
+            let current_choice = subarrayChoice(word_list, word_count_in_board);
 
             if (board_choices.includes(current_choice)) {
                 console.log("Already exists: " + current_choice);
@@ -143,10 +143,8 @@
             board_choices.push(current_choice);
         }
 
-        boards_htmls = board_choices.map(x => getBoardHTML(x, board_size));
-        boards_html = boards_htmls.join("<br/><br/><br/>");
-
-        document.getElementById("boards").innerHTML = boards_html;
+        const boards_htmls = board_choices.map(x => getBoardHTML(x, board_size));
+        document.getElementById("boards").innerHTML = boards_htmls.join("<br/><br/><br/>");
     }
 </script>
 
